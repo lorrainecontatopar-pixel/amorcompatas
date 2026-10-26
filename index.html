@@ -180,6 +180,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
           <button type="button" class="btn ghost" data-painel="painel-servicos" aria-expanded="false" aria-controls="painel-servicos">Ver serviços</button>
           <button type="button" class="btn ghost" data-painel="painel-fotos" aria-expanded="false" aria-controls="painel-fotos">Fotos</button>
           <button type="button" class="btn ghost" data-painel="painel-comentarios" aria-expanded="false" aria-controls="painel-comentarios">Comentários</button>
+          <button type="button" class="btn ghost" data-painel="painel-dicas" aria-expanded="false" aria-controls="painel-dicas">Dicas</button>
           <button type="button" class="btn ghost" data-painel="painel-orcamento" aria-expanded="false" aria-controls="painel-orcamento">Pedir orçamento</button>
           <button type="button" class="btn ghost" data-painel="painel-contatos" aria-expanded="false" aria-controls="painel-contatos">Contatos</button>
         </div>
@@ -248,6 +249,17 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
       </form>
       <p class="erro" id="d-erro" role="alert"></p>
       <button type="button" class="btn" id="d-enviar">Enviar depoimento</button>
+    </div>
+
+    <div id="painel-dicas" class="painel" hidden>
+      <div class="painel-head"><h2>Dicas</h2><button class="fechar" type="button" aria-label="Fechar dicas">&times;</button></div>
+      <p>Informações que ajudam você e o seu pet. Clique no assunto para abrir.</p>
+      <div class="especies">
+          <details class="especie"><summary>Antes de viajar</summary><div class="corpo"><ul style="margin:.2rem 0 .8rem 1.1rem;padding:0"><li style="margin:.3rem 0">Deixe a ração separada em porções e anote o horário de cada refeição.</li><li style="margin:.3rem 0">Escreva os remédios: nome, horário e como o veterinário orientou dar.</li><li style="margin:.3rem 0">Passe o contato do veterinário de confiança e de uma pessoa para emergências.</li><li style="margin:.3rem 0">Deixe a casa segura: portões trancados, produtos de limpeza e plantas tóxicas fora do alcance.</li><li style="margin:.3rem 0">Mantenha a rotina e deixe a caminha, os brinquedos e a roupa com o seu cheiro.</li></ul></div></details>
+          <details class="especie"><summary>Passeio seguro</summary><div class="corpo"><ul style="margin:.2rem 0 .8rem 1.1rem;padding:0"><li style="margin:.3rem 0">Evite o sol forte. Encoste as costas da mão no chão por 5 segundos: se estiver quente demais para você, está quente demais para as patinhas.</li><li style="margin:.3rem 0">Use guia curta, peitoral bem ajustado e plaquinha com o seu telefone.</li><li style="margin:.3rem 0">Leve água. Cães de focinho curto, como pug e bulldog, sofrem mais com o calor.</li><li style="margin:.3rem 0">Se o cão ofegar demais, deitar ou travar, pare na sombra e ofereça água.</li><li style="margin:.3rem 0">Mantenha vacinas e proteção contra carrapatos em dia.</li></ul></div></details>
+          <details class="especie"><summary>Primeira visita</summary><div class="corpo"><ul style="margin:.2rem 0 .8rem 1.1rem;padding:0"><li style="margin:.3rem 0">Antes de começar, a gente combina uma visita para eu conhecer o seu pet, a casa e a rotina.</li><li style="margin:.3rem 0">Combinamos chaves, horários, comida, remédios e o que o seu pet gosta.</li><li style="margin:.3rem 0">Me conte também o que ele teme, se foge, se late ou se é agitado com visitas.</li><li style="margin:.3rem 0">Assim eu cuido do seu pet do jeito que ele já está acostumado.</li></ul></div></details>
+          <details class="especie"><summary>Sinais de alerta</summary><div class="corpo"><ul style="margin:.2rem 0 .8rem 1.1rem;padding:0"><li style="margin:.3rem 0">Procure um veterinário se houver vômito ou diarreia repetidos, apatia, falta de apetite por mais de um dia ou dificuldade para respirar.</li><li style="margin:.3rem 0">Gato que tenta urinar e não consegue é emergência: leve na hora ao veterinário.</li><li style="margin:.3rem 0">Barriga inchada e dura, convulsão ou desmaio também pedem atendimento imediato.</li><li style="margin:.3rem 0">Animais pequenos e exóticos escondem a doença. Qualquer mudança no jeito de comer ou se mover merece atenção.</li></ul><p class="preco" style="font-weight:400;font-size:.9rem">São orientações gerais e não substituem a consulta com o veterinário.</p></div></details>
+      </div>
     </div>
 
     <div id="painel-orcamento" class="painel" hidden>
