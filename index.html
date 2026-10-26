@@ -201,14 +201,9 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
           <details class="especie"><summary>Aves</summary><div class="corpo"><p>Calopsitas, periquitos, agapornis e canários.</p><p class="preco">30 a 45 min: R$ 50</p><p class="preco">1 hora: R$ 75</p></div></details>
           <details class="especie"><summary>Coelhos e porquinhos-da-índia</summary><div class="corpo"><p>Alimentação, feno, limpeza da gaiola e um tempo de brincadeira.</p><p class="preco">30 a 45 min: R$ 55</p><p class="preco">1 hora: R$ 80</p></div></details>
           <details class="especie"><summary>Tartarugas e jabutis</summary><div class="corpo"><p>Jabutis, tigres-d’água e cágados.</p><p class="preco">30 a 45 min: R$ 50</p><p class="preco">1 hora: R$ 75</p></div></details>
-          <details class="especie"><summary>Furões</summary><div class="corpo"><p>Eles precisam de brincadeira, caixa de areia limpa e atenção.</p><p class="preco">30 a 45 min: R$ 65</p><p class="preco">1 hora: R$ 95</p></div></details>
           <details class="especie"><summary>Iguanas, lagartos e serpentes</summary><div class="corpo"><p>Cuidado com temperatura, umidade, alimentação e limpeza do terrário.</p><p class="preco">30 a 45 min: R$ 70</p><p class="preco">1 hora: R$ 100</p></div></details>
           <details class="especie"><summary>Hamsters e outros roedores pequenos</summary><div class="corpo"><p>Hamsters, gerbils e twisters: ração, água, limpeza e atenção.</p><p class="preco">30 a 45 min: R$ 45</p><p class="preco">1 hora: R$ 65</p></div></details>
-          <details class="especie"><summary>Chinchilas</summary><div class="corpo"><p>Cuidado com temperatura, banho de areia e alimentação.</p><p class="preco">30 a 45 min: R$ 50</p><p class="preco">1 hora: R$ 75</p></div></details>
-          <details class="especie"><summary>Ouriços-pigmeus</summary><div class="corpo"><p>Alimentação, limpeza e manejo com calma e segurança.</p><p class="preco">30 a 45 min: R$ 55</p><p class="preco">1 hora: R$ 80</p></div></details>
-          <details class="especie"><summary>Tarântulas e outros invertebrados</summary><div class="corpo"><p>Alimentação, água e conferência da temperatura e da umidade.</p><p class="preco">30 a 45 min: R$ 55</p><p class="preco">1 hora: R$ 80</p></div></details>
-          <details class="especie"><summary>Papagaios, araras e aves de grande porte</summary><div class="corpo"><p>Alimentação, limpeza, companhia e atenção à rotina da ave.</p><p class="preco">30 a 45 min: R$ 65</p><p class="preco">1 hora: R$ 95</p></div></details>
-          <details class="especie"><summary>Outros</summary><div class="corpo"><p>Tem outra espécie? Me conte qual é e eu combino o valor com você.</p><p class="preco">Valor a combinar</p><a class="btn js-wa" href="#contato">Falar no WhatsApp</a></div></details>
+          <details class="especie"><summary>Outro</summary><div class="corpo"><p>Tem outra espécie? Me conte qual é e eu combino o valor com você.</p><p class="preco">Valor a combinar</p><a class="btn js-wa" href="#contato">Falar no WhatsApp</a></div></details>
         </div></article>
         
         <article><h3>Não achou o que procurava?</h3><p>Fale comigo no WhatsApp e conte o que o seu pet precisa.</p><a class="btn js-wa" href="#contato">Clique aqui</a></article>
@@ -310,7 +305,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
     passeio:{nome:"Passeio com cães", un:"passeio", dur:[["30 min",50],["60 min",60]], pac:{"2":[90,110],"3":[132,159],"5":[205,250]}},
     visita:{nome:"Visita pet sitter (cães e gatos)", un:"visita", dur:[["30 a 40 min",45],["1 hora",70]]},
     exotico:{nome:"Visita a animal silvestre ou exótico", un:"visita", dur:[["30 a 45 min",0],["1 hora",1]],
-      esp:{"Aves":[50,75],"Coelhos e porquinhos-da-índia":[55,80],"Tartarugas e jabutis":[50,75],"Furões":[65,95],"Iguanas, lagartos e serpentes":[70,100],"Hamsters e outros roedores pequenos":[45,65],"Chinchilas":[50,75],"Ouriços-pigmeus":[55,80],"Tarântulas e outros invertebrados":[55,80],"Papagaios, araras e aves de grande porte":[65,95],"Outros (valor a combinar)":[0,0]}}
+      esp:{"Aves":[50,75],"Coelhos e porquinhos-da-índia":[55,80],"Tartarugas e jabutis":[50,75],"Iguanas, lagartos e serpentes":[70,100],"Hamsters e outros roedores pequenos":[45,65],"Outro (valor a combinar)":[0,0]}}
   };
   var $ = function(id){ return document.getElementById(id); };
   var REG = {"Zona Sul":8,"Centro":15,"Zona Sudeste":15,"Zona Oeste":18,"Zona Norte":33,"Zona Leste":24};
@@ -326,7 +321,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
   function precoBase(){
     var s=SERV[oS.value]; if(!s||oD.value==="") return null;
     var i=Number(oD.value);
-    if(oS.value==="exotico"){ if(!oE.value) return null; if(oE.value.indexOf("Outros")===0) return -1; return s.esp[oE.value][i]; }
+    if(oS.value==="exotico"){ if(!oE.value) return null; if(oE.value.indexOf("Outro")===0) return -1; return s.esp[oE.value][i]; }
     return s.dur[i][1];
   }
   var NOTA = "Já inclui a taxa de deslocamento da sua região, cobrada por visita. Domingos +15%, feriados +20% e Natal e Ano Novo +30%.";
