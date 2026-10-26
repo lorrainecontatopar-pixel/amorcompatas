@@ -239,6 +239,15 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
         <article class="card"><p>“A melhor das melhores!”</p><p style="margin-top:.8rem;font-weight:700;color:var(--ink)">Fernanda</p></article>
         <article class="card"><p>“Minha experiência foi ótima! A Lorraine é super simpática e experiente com os animais. Eu e meus cachorros adoramos! Recomendo demais!”</p><p style="margin-top:.8rem;font-weight:700;color:var(--ink)">Robson</p></article>
       </div>
+      <h3 style="margin:1.6rem 0 .4rem">Deixe o seu depoimento</h3>
+      <p>Atendi o seu pet? Conte como foi. Seu texto chega direto no meu WhatsApp e, com a sua autorização, eu publico aqui.</p>
+      <form id="form-dep" class="orc" novalidate>
+        <label class="full">Seu nome<input type="text" id="d-nome" autocomplete="name" placeholder="Como posso te chamar?"></label>
+        <label class="full">Seu depoimento<textarea id="d-texto" rows="4" placeholder="Como foi o atendimento com o seu pet?"></textarea></label>
+        <label class="full" style="display:flex;gap:.6rem;align-items:flex-start;font-weight:400"><input type="checkbox" id="d-ok" style="width:auto;margin-top:.25rem"><span>Autorizo a publicação do meu depoimento no site.</span></label>
+      </form>
+      <p class="erro" id="d-erro" role="alert"></p>
+      <button type="button" class="btn" id="d-enviar">Enviar depoimento</button>
     </div>
 
     <div id="painel-orcamento" class="painel" hidden>
@@ -381,6 +390,13 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
     if(total!==-1&&ult&&ult.desc>0) linhas.push("Desconto nas visitas: "+Math.round(ult.desc*100)+"%");
     if(total!==-1&&ult&&ult.viagens>=3) linhas.push("Pagamento: 50% adiantado e o restante no último dia.");
     window.open("https://wa.me/"+WHATSAPP+"?text="+encodeURIComponent(linhas.join("\n")),"_blank","noopener");
+  });
+  $("d-enviar").addEventListener("click", function(){
+    var nome=$("d-nome").value.trim(), txt=$("d-texto").value.trim(), erro=$("d-erro");
+    if(!nome || txt.length<10){ erro.textContent="Preencha seu nome e escreva seu depoimento."; return; }
+    erro.textContent="";
+    var m="Olá! Quero deixar um depoimento sobre a Amor com Patas.\n\nNome: "+nome+"\nDepoimento: "+txt+"\n\nAutorizo a publicação no site: "+($("d-ok").checked?"Sim":"Não");
+    window.open("https://wa.me/"+WHATSAPP+"?text="+encodeURIComponent(m),"_blank","noopener");
   });
   // Troque pelo seu número com código do país e DDD, só números. Ex.: 5512999999999
   var WHATSAPP = "5511944881047";
