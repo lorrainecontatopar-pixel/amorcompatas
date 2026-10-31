@@ -331,7 +331,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
       esp:{"Aves":[50,75],"Coelhos e porquinhos-da-índia":[55,80],"Tartarugas e jabutis":[50,75],"Iguanas, lagartos e serpentes":[70,100],"Hamsters e outros roedores pequenos":[45,65],"Outro (valor a combinar)":[0,0]}}
   };
   var $ = function(id){ return document.getElementById(id); };
-  var KM_VALOR = 0.20; // R$ por km rodado (ida e volta)
+  var KM_VALOR = 0.50, KM_MIN = 5; // R$ por km (ida e volta) e mínimo por viagem
   var ORIGEM = "Interlagos, São José dos Campos, SP, Brasil";
   var origemXY = null, distKm = null;
   var oS=$("o-servico"), oE=$("o-especie"), oD=$("o-duracao"), oEW=$("o-esp-wrap");
@@ -359,7 +359,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
     if(base===null){ $("o-total").textContent="Responda as perguntas acima"; $("o-nota").textContent=NOTA; return null; }
     if(base===-1){ $("o-total").textContent="Valor a combinar"; $("o-nota").textContent=NOTA; return -1; }
     if(distKm===null){ $("o-total").textContent="Informe o endereço e clique em Calcular deslocamento"; $("o-nota").textContent=NOTA; return null; }
-    var tx=Math.round(distKm*KM_VALOR*100)/100;
+    var tx=Math.max(KM_MIN, Math.round(distKm*KM_VALOR*100)/100);
     var n=pacoteN(), extraAn=(qtd>2?(qtd-2)*6:0), viagens, servico, desc=0, semanas=1;
     if(n>1){
       semanas=limitar($("o-semanas").value,1,12); viagens=n*semanas;
@@ -369,10 +369,10 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
       if(oS.value!=="passeio") desc = viagens>=14?0.12:(viagens>=7?0.10:(viagens>=3?0.05:0));
       servico = viagens*base*(1-desc) + viagens*extraAn;
     }
-    var kmTotal = Math.round(distKm*viagens*10)/10, desloc = Math.round(kmTotal*KM_VALOR*100)/100, total = servico + desloc;
+    var desloc = Math.round((tx + (viagens-1)*tx*0.5)*100)/100, total = servico + desloc;
     ult={viagens:viagens,semanas:semanas,desc:desc,desloc:desloc,n:n};
     $("o-total").textContent=brl(total);
-    var t="Inclui "+brl(desloc)+" de deslocamento"+(viagens>1?" ("+kmTotal.toFixed(1).replace(".",",")+" km no total, ida e volta)":" ("+distKm.toFixed(1).replace(".",",")+" km, ida e volta)")+".";
+    var t="Inclui "+brl(desloc)+" de deslocamento"+(viagens>1?" ("+distKm.toFixed(1).replace(".",",")+" km de ida e volta por viagem; taxa cheia na 1ª viagem e 50% nas demais)":" ("+distKm.toFixed(1).replace(".",",")+" km, ida e volta)")+".";
     if(desc>0) t+=" Desconto de "+Math.round(desc*100)+"% nas visitas.";
     if(viagens>=3) t+=" Em contratos de vários dias, 50% é pago adiantado e o restante no último dia.";
     t+=" Domingos +15%, feriados +20% e Natal e Ano Novo +30%.";
