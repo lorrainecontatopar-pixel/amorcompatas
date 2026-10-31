@@ -150,6 +150,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
 @media (max-width:760px){.galeria{column-count:2;column-gap:.7rem}.galeria figure{margin:0 0 .7rem}}
 .logo-final{display:flex;justify-content:center;margin:2.5rem 0 1.5rem}.logo-final img{width:200px;height:200px;border-radius:50%;box-shadow:0 6px 22px rgba(120,40,20,.2)}@media (max-width:760px){.logo-final img{width:150px;height:150px}}
 #form-orc[data-sv="0"]>:not(.sempre){display:none}
+#o-detalhe{display:none}
 </style>
 </head>
 <body>
@@ -287,7 +288,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
         <ul id="o-detalhe" style="margin:.2rem 0 .6rem 1.1rem;padding:0;font-size:.95rem"></ul>
         <p style="margin:0">Valor estimado do serviço</p>
         <strong id="o-total">Responda as perguntas acima</strong>
-        <p id="o-nota" style="margin-top:.4rem;font-size:.9rem">Valor do serviço, sem o deslocamento. O deslocamento eu calculo pelo seu endereço e te passo no WhatsApp. Domingos +15%, feriados +20% e Natal e Ano Novo +30%.</p>
+        <p id="o-nota" style="margin-top:.4rem;font-size:.9rem">Esse valor não inclui o deslocamento. Eu calculo pelo seu endereço e te passo no WhatsApp.</p>
       </div>
       <p class="erro" id="o-erro" role="alert"></p>
       <button type="button" class="btn" id="o-enviar" hidden>Enviar para o WhatsApp</button>
@@ -350,7 +351,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
     if(oS.value==="exotico"){ if(!oE.value) return null; if(oE.value.indexOf("Outro")===0) return -1; return s.esp[oE.value][i]; }
     return s.dur[i][1];
   }
-  var NOTA = "Valor do serviço, sem o deslocamento. O deslocamento eu calculo pelo seu endereço e te passo no WhatsApp. Domingos +15%, feriados +20% e Natal e Ano Novo +30%.";
+  var NOTA = "Esse valor não inclui o deslocamento. Eu calculo pelo seu endereço e te passo no WhatsApp.";
   var ult = null;
   function limitar(v,a,b){ v=Number(v)||a; return Math.min(b,Math.max(a,v)); }
   function dias(){
@@ -435,8 +436,6 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
     detalhe(L);
     $("o-total").textContent=brl(servico);
     var t=NOTA;
-    if(oS.value==="passeio") t+=" Passeios em domingos e feriados também têm acréscimo, que eu confirmo no WhatsApp.";
-    if(viagens>=3) t+=" Em contratos de vários dias, 50% é pago adiantado e o restante no último dia.";
     $("o-nota").textContent=t;
     return servico;
   }
