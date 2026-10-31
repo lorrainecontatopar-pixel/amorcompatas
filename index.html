@@ -149,6 +149,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
 .galeria img{aspect-ratio:auto;height:auto;object-fit:initial;filter:saturate(1.12) contrast(1.05) brightness(1.04) sepia(.07)}
 @media (max-width:760px){.galeria{column-count:2;column-gap:.7rem}.galeria figure{margin:0 0 .7rem}}
 .logo-final{display:flex;justify-content:center;margin:2.5rem 0 1.5rem}.logo-final img{width:200px;height:200px;border-radius:50%;box-shadow:0 6px 22px rgba(120,40,20,.2)}@media (max-width:760px){.logo-final img{width:150px;height:150px}}
+#form-orc[data-sv="0"]>:not(.sempre){display:none}
 </style>
 </head>
 <body>
@@ -267,9 +268,9 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
     <div id="painel-orcamento" class="painel" hidden>
       <div class="painel-head"><h2>Pedir orçamento</h2><button class="fechar" type="button" aria-label="Fechar orçamento">&times;</button></div>
       <p>Responda as perguntas e veja o valor estimado. No final, é só enviar para o meu WhatsApp que eu entro em contato.</p>
-      <form id="form-orc" class="orc" novalidate>
-        <label class="full">Seu nome<input type="text" id="o-nome" autocomplete="name" placeholder="Como posso te chamar?"></label>
-        <label>Serviço<select id="o-servico"><option value="">Escolha...</option><option value="passeio">Passeio com cães</option><option value="gato">Pet sitter para gatos</option><option value="cao">Pet sitter para cães</option><option value="exotico">Pet sitter para animais exóticos</option></select></label>
+      <form id="form-orc" class="orc" data-sv="0" novalidate>
+        <label class="full sempre">Seu nome<input type="text" id="o-nome" autocomplete="name" placeholder="Como posso te chamar?"></label>
+        <label class="full sempre">Serviço<select id="o-servico"><option value="">Escolha...</option><option value="passeio">Passeio com cães</option><option value="gato">Pet sitter para gatos</option><option value="cao">Pet sitter para cães</option><option value="exotico">Pet sitter para animais exóticos</option></select></label>
         <label id="o-esp-wrap" hidden>Espécie<select id="o-especie"><option value="">Escolha...</option></select></label>
         <label>Duração<select id="o-duracao"><option value="">Escolha o serviço primeiro</option></select></label>
         <label id="o-pac-wrap" hidden>Pacote semanal<select id="o-pacote"><option value="1">Passeio avulso</option><option value="2">2x por semana</option><option value="3">3x por semana</option><option value="5">5x por semana</option></select></label>
@@ -282,14 +283,14 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
         <label>Número<input type="text" id="o-num" inputmode="numeric" maxlength="8" placeholder="Número da casa ou prédio"></label>
         <label class="full">Quer me contar mais alguma coisa?<textarea id="o-obs" rows="3" placeholder="Nome do pet, idade, remédios, cuidados especiais..."></textarea></label>
       </form>
-      <div class="estimativa" aria-live="polite">
+      <div class="estimativa" id="o-resumo" aria-live="polite" hidden>
         <ul id="o-detalhe" style="margin:.2rem 0 .6rem 1.1rem;padding:0;font-size:.95rem"></ul>
         <p style="margin:0">Valor estimado do serviço</p>
         <strong id="o-total">Responda as perguntas acima</strong>
         <p id="o-nota" style="margin-top:.4rem;font-size:.9rem">Valor do serviço, sem o deslocamento. O deslocamento eu calculo pelo seu endereço e te passo no WhatsApp. Domingos +15%, feriados +20% e Natal e Ano Novo +30%.</p>
       </div>
       <p class="erro" id="o-erro" role="alert"></p>
-      <button type="button" class="btn" id="o-enviar">Enviar para o WhatsApp</button>
+      <button type="button" class="btn" id="o-enviar" hidden>Enviar para o WhatsApp</button>
     </div>
 
     <div id="painel-contatos" class="painel" hidden>
@@ -373,6 +374,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
     linhas.forEach(function(l){ var li=document.createElement("li"); li.textContent=l; ul.appendChild(li); });
   }
   function calcular(){
+    var temSv=!!oS.value; $("form-orc").setAttribute("data-sv",temSv?"1":"0"); $("o-resumo").hidden=!temSv; $("o-enviar").hidden=!temSv; if(!temSv) $("o-erro").textContent="";
     textoVisitas(); $("o-vis-wrap").hidden = (oS.value==="passeio"||pacoteN()>1); $("o-data-wrap").hidden = (oS.value==="passeio"); $("o-sem-wrap").hidden = !(pacoteN()>1);
     ult=null; detalhe([]);
     var base=precoBase(), qtd=limitar($("o-qtd").value,1,10);
