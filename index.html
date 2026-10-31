@@ -396,7 +396,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
     }
     var un=(oS.value==="passeio"?"passeio":"visita");
     if(gExt>0){ L.push("Gatos a mais ("+gExt+" × R$ 2,00 por "+un+"): + "+brl(viagens*gExt*2)); servico+=viagens*gExt*2; }
-    if(oExt>0){ L.push("Animais a mais ("+oExt+" × R$ 6,00 por "+un+"): + "+brl(viagens*oExt*6)); servico+=viagens*oExt*6; }
+    if(oExt>0){ L.push((oS.value==="visita"?"Cães a mais (":"Animais a mais (")+oExt+" × R$ 6,00 por "+un+"): + "+brl(viagens*oExt*6)); servico+=viagens*oExt*6; }
     ult={viagens:viagens,semanas:semanas,desc:desc,n:n};
     detalhe(L);
     $("o-total").textContent=brl(servico);
