@@ -278,7 +278,8 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
         <label id="o-vis-wrap"><span id="o-vis-txt">Quantos passeios ao todo?</span><input type="number" id="o-visitas" min="1" max="60" value="1" inputmode="numeric"><small id="o-vis-info" style="font-weight:400;display:block;margin-top:.3rem"></small></label>
         <label>Data de início<input type="date" id="o-data"></label>
         <label id="o-fim-wrap" hidden>Data final<input type="date" id="o-fim"></label>
-        <label class="full">Bairro<input type="text" id="o-bairro" placeholder="Em que bairro de São José dos Campos?"></label>
+        <label>CEP<input type="text" id="o-cep" inputmode="numeric" maxlength="9" placeholder="00000-000" autocomplete="postal-code"></label>
+        <label>Número<input type="text" id="o-num" inputmode="numeric" maxlength="8" placeholder="Número da casa ou prédio"></label>
         <label class="full">Quer me contar mais alguma coisa?<textarea id="o-obs" rows="3" placeholder="Nome do pet, idade, remédios, cuidados especiais..."></textarea></label>
       </form>
       <div class="estimativa" aria-live="polite">
@@ -413,6 +414,8 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
   ["change","input"].forEach(function(ev){ $("form-orc").addEventListener(ev, calcular); });
   $("o-enviar").addEventListener("click", function(){
     var nome=$("o-nome").value.trim(), erro=$("o-erro"), total=calcular();
+    var cep=$("o-cep").value.replace(/\D/g,""), num=$("o-num").value.trim();
+    if(cep.length!==8 || !num){ erro.textContent="Informe o CEP (8 números) e o número do endereço para eu calcular o deslocamento."; return; }
     if(!nome || total===null){ erro.textContent="Preencha seu nome, o serviço, a espécie (se for animal exótico) e a duração para enviar."; return; }
     erro.textContent="";
     var s=SERV[oS.value], dur=s.dur[Number(oD.value)][0], vis=totalVisitas(), qtd=limitar($("o-qtd").value,1,10);
@@ -424,7 +427,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
       "Nome: "+nome,"Serviço: "+s.nome];
     if(oS.value==="exotico") linhas.push("Espécie: "+oE.value);
     linhas.push("Duração: "+dur,"Animais: "+qtd+(oS.value==="visita"&&limitar($("o-gatos").value,0,10)>0?" ("+Math.min(limitar($("o-gatos").value,0,10),qtd)+" gatos)":""),(pacoteN()>1 ? "Pacote: "+pacoteN()+"x por semana, durante "+ult.semanas+" semana"+(ult.semanas>1?"s":"")+" ("+ult.viagens+" passeios)" : (oS.value==="passeio" ? "Quantidade: "+vis+" "+s.un+(vis>1?"s":"") : "Visitas: "+limitar($("o-visitas").value,1,6)+" por dia, "+dias()+" dia"+(dias()>1?"s":"")+" ("+vis+" no total)")),"Início: "+data,
-      "Bairro: "+($("o-bairro").value.trim()||"não informado"));
+      "CEP: "+cep.slice(0,5)+"-"+cep.slice(5),"Número: "+num);
     if(fim) linhas.splice(linhas.indexOf("Início: "+data)+1,0,"Término: "+fim);
     var obs=$("o-obs").value.trim(); if(obs) linhas.push("Observações: "+obs);
     linhas.push("", total===-1 ? "Valor: a combinar (espécie fora da lista)" : "Valor estimado do serviço: "+brl(total)+" (sem o deslocamento, que você me passa pelo WhatsApp)");
@@ -432,6 +435,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
     if(total!==-1&&ult&&ult.viagens>=3) linhas.push("Pagamento: 50% adiantado e o restante no último dia.");
     window.open("https://wa.me/"+WHATSAPP+"?text="+encodeURIComponent(linhas.join("\n")),"_blank","noopener");
   });
+  $("o-cep").addEventListener("input", function(){ var v=this.value.replace(/\D/g,"").slice(0,8); this.value=v.length>5?v.slice(0,5)+"-"+v.slice(5):v; });
   $("d-enviar").addEventListener("click", function(){
     var nome=$("d-nome").value.trim(), txt=$("d-texto").value.trim(), erro=$("d-erro");
     if(!nome || txt.length<10){ erro.textContent="Preencha seu nome e escreva seu depoimento."; return; }
