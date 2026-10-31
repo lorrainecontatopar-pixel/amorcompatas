@@ -274,7 +274,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
         <label id="o-pac-wrap" hidden>Pacote semanal<select id="o-pacote"><option value="1">Passeio avulso</option><option value="2">2x por semana</option><option value="3">3x por semana</option><option value="5">5x por semana</option></select></label>
         <label>Quantos animais?<input type="number" id="o-qtd" min="1" max="10" value="1" inputmode="numeric"></label>
         <label id="o-sem-wrap" hidden>Quantas semanas?<input type="number" id="o-semanas" min="1" max="12" value="4" inputmode="numeric"></label>
-        <label id="o-vis-wrap">Quantas visitas ou passeios ao todo?<input type="number" id="o-visitas" min="1" max="60" value="1" inputmode="numeric"></label>
+        <label id="o-vis-wrap"><span id="o-vis-txt">Quantos passeios ao todo?</span><input type="number" id="o-visitas" min="1" max="60" value="1" inputmode="numeric"><small id="o-vis-info" style="font-weight:400;display:block;margin-top:.3rem"></small></label>
         <label>Data de início<input type="date" id="o-data"></label>
         <label id="o-fim-wrap" hidden>Data final<input type="date" id="o-fim"></label>
         <label>CEP<input type="text" id="o-cep" inputmode="numeric" maxlength="9" placeholder="00000-000" autocomplete="postal-code"></label>
@@ -353,8 +353,24 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
   var NOTA = "Já inclui o deslocamento, calculado pela distância, cobrado por visita. Domingos +15%, feriados +20% e Natal e Ano Novo +30%.";
   var ult = null;
   function limitar(v,a,b){ v=Number(v)||a; return Math.min(b,Math.max(a,v)); }
+  function dias(){
+    var a=$("o-data").value, b=$("o-fim").value;
+    if(!a||!b||b<a) return 1;
+    return Math.min(60, Math.round((new Date(b+"T00:00:00")-new Date(a+"T00:00:00"))/86400000)+1);
+  }
+  function totalVisitas(){
+    if(oS.value==="passeio") return limitar($("o-visitas").value,1,60);
+    return Math.min(60, limitar($("o-visitas").value,1,6)*dias());
+  }
+  function textoVisitas(){
+    var ehV = oS.value!=="passeio";
+    $("o-vis-txt").textContent = ehV ? "Quantas visitas por dia?" : "Quantos passeios ao todo?";
+    var info=$("o-vis-info"); if(!ehV){ info.textContent=""; return; }
+    var p=limitar($("o-visitas").value,1,6), d=dias();
+    info.textContent = d>1 ? d+" dias × "+p+" visita"+(p>1?"s":"")+" por dia = "+(p*d)+" visitas no total" : "Informe a data final para eu somar todos os dias.";
+  }
   function calcular(){
-    $("o-vis-wrap").hidden = pacoteN()>1; $("o-sem-wrap").hidden = !(pacoteN()>1);
+    textoVisitas(); $("o-vis-wrap").hidden = pacoteN()>1; $("o-sem-wrap").hidden = !(pacoteN()>1);
     ult=null;
     var base=precoBase(), qtd=limitar($("o-qtd").value,1,10);
     if(base===null){ $("o-total").textContent="Responda as perguntas acima"; $("o-nota").textContent=NOTA; return null; }
@@ -366,7 +382,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
       semanas=limitar($("o-semanas").value,1,12); viagens=n*semanas;
       servico=SERV.passeio.pac[n][Number(oD.value)]*semanas + viagens*extraAn;
     } else {
-      viagens=limitar($("o-visitas").value,1,60);
+      viagens=totalVisitas();
       if(oS.value!=="passeio") desc = viagens>=14?0.12:(viagens>=7?0.10:(viagens>=3?0.05:0));
       servico = viagens*base*(1-desc) + viagens*extraAn;
     }
@@ -427,7 +443,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
     var nome=$("o-nome").value.trim(), erro=$("o-erro"), total=calcular();
     if(!nome || total===null){ erro.textContent="Preencha seu nome, o serviço, a espécie (se for animal exótico) e a duração para enviar."; return; }
     erro.textContent="";
-    var s=SERV[oS.value], dur=s.dur[Number(oD.value)][0], vis=limitar($("o-visitas").value,1,60), qtd=limitar($("o-qtd").value,1,10);
+    var s=SERV[oS.value], dur=s.dur[Number(oD.value)][0], vis=totalVisitas(), qtd=limitar($("o-qtd").value,1,10);
     var d=$("o-data").value, data=d?d.split("-").reverse().join("/"):"a combinar";
     var fimV=$("o-fim").value;
     if(fimV && d && fimV<d){ erro.textContent="A data final não pode ser antes da data de início."; return; }
@@ -435,7 +451,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
     var linhas=["Olá! Quero pedir um orçamento da Amor com Patas.","",
       "Nome: "+nome,"Serviço: "+s.nome];
     if(oS.value==="exotico") linhas.push("Espécie: "+oE.value);
-    linhas.push("Duração: "+dur,"Animais: "+qtd,(pacoteN()>1 ? "Pacote: "+pacoteN()+"x por semana, durante "+ult.semanas+" semana"+(ult.semanas>1?"s":"")+" ("+ult.viagens+" passeios)" : "Quantidade: "+vis+" "+s.un+(vis>1?"s":"")),"Início: "+data,
+    linhas.push("Duração: "+dur,"Animais: "+qtd,(pacoteN()>1 ? "Pacote: "+pacoteN()+"x por semana, durante "+ult.semanas+" semana"+(ult.semanas>1?"s":"")+" ("+ult.viagens+" passeios)" : (oS.value==="passeio" ? "Quantidade: "+vis+" "+s.un+(vis>1?"s":"") : "Visitas: "+limitar($("o-visitas").value,1,6)+" por dia, "+dias()+" dia"+(dias()>1?"s":"")+" ("+vis+" no total)")),"Início: "+data,
       (bairroSel?"Bairro: "+bairroSel:"Bairro: não informado"),"Distância (ida e volta): "+(distKm===null?"não calculada":distKm.toFixed(1).replace(".",",")+" km"));
     if(fim) linhas.splice(linhas.indexOf("Início: "+data)+1,0,"Término: "+fim);
     var obs=$("o-obs").value.trim(); if(obs) linhas.push("Observações: "+obs);
