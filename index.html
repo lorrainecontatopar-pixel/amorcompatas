@@ -432,7 +432,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
       });
       servico+=acr;
     }
-    ult={viagens:viagens,semanas:semanas,desc:desc,n:n,acr:acr};
+    ult={viagens:viagens,semanas:semanas,desc:desc,n:n,acr:acr,det:L.slice(2)};
     detalhe(L);
     $("o-total").textContent=brl(servico);
     var t=NOTA;
@@ -465,7 +465,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
     if(oS.value==="passeio") linhas=linhas.filter(function(l){ return l.indexOf("Início: ")!==0; });
     var obs=$("o-obs").value.trim(); if(obs) linhas.push("Observações: "+obs);
     linhas.push("", total===-1 ? "Valor: a combinar (espécie fora da lista)" : "Valor estimado do serviço: "+brl(total)+" (sem o deslocamento, que você me passa pelo WhatsApp)");
-    if(total!==-1&&ult&&ult.acr>0) linhas.push("Inclui acréscimo de domingos/feriados: "+brl(ult.acr));
+    if(total!==-1&&ult&&ult.det&&ult.det.length){ linhas.push("","Detalhamento do valor:"); ult.det.forEach(function(d){ linhas.push("- "+d); }); }
     if(total!==-1&&ult&&ult.desc>0) linhas.push("Desconto nas visitas: "+Math.round(ult.desc*100)+"%");
     if(total!==-1&&ult&&ult.viagens>=3) linhas.push("Pagamento: 50% adiantado e o restante no último dia.");
     window.open("https://wa.me/"+WHATSAPP+"?text="+encodeURIComponent(linhas.join("\n")),"_blank","noopener");
