@@ -273,6 +273,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
         <label>Duração<select id="o-duracao"><option value="">Escolha o serviço primeiro</option></select></label>
         <label id="o-pac-wrap" hidden>Pacote semanal<select id="o-pacote"><option value="1">Passeio avulso</option><option value="2">2x por semana</option><option value="3">3x por semana</option><option value="5">5x por semana</option></select></label>
         <label>Quantos animais?<input type="number" id="o-qtd" min="1" max="10" value="1" inputmode="numeric"></label>
+        <label id="o-gatos-wrap" hidden>Desses, quantos são gatos?<input type="number" id="o-gatos" min="0" max="10" value="0" inputmode="numeric"></label>
         <label id="o-sem-wrap" hidden>Quantas semanas?<input type="number" id="o-semanas" min="1" max="12" value="4" inputmode="numeric"></label>
         <label id="o-vis-wrap"><span id="o-vis-txt">Quantos passeios ao todo?</span><input type="number" id="o-visitas" min="1" max="60" value="1" inputmode="numeric"><small id="o-vis-info" style="font-weight:400;display:block;margin-top:.3rem"></small></label>
         <label>Data de início<input type="date" id="o-data"></label>
@@ -375,7 +376,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
     var base=precoBase(), qtd=limitar($("o-qtd").value,1,10);
     if(base===null){ $("o-total").textContent="Responda as perguntas acima"; $("o-nota").textContent=NOTA; return null; }
     if(base===-1){ $("o-total").textContent="Valor a combinar"; $("o-nota").textContent=NOTA; return -1; }
-    var n=pacoteN(), extraAn=(qtd>2?(qtd-2)*6:0), viagens, servico, desc=0, semanas=1, L=[];
+    var n=pacoteN(), ext=Math.max(0,qtd-2), gatos=(oS.value==="visita"?Math.min(limitar($("o-gatos").value,0,10),qtd):0), gExt=Math.min(gatos,ext), oExt=ext-gExt, extraAn=gExt*2+oExt*6, viagens, servico, desc=0, semanas=1, L=[];
     var s0=SERV[oS.value], durTxt=s0.dur[Number(oD.value)][0];
     L.push("Serviço: "+s0.nome+(oS.value==="exotico"?" ("+oE.value+")":"")+", "+durTxt);
     L.push("Animais: "+qtd);
@@ -387,13 +388,15 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
     } else {
       viagens=totalVisitas();
       var ehV=oS.value!=="passeio";
-      L.push(ehV ? limitar($("o-visitas").value,1,6)+" visita"+(limitar($("o-visitas").value,1,6)>1?"s":"")+" por dia × "+dias()+" dia"+(dias()>1?"s":"")+" = "+viagens+" visitas × "+brl(base)+" = "+brl(viagens*base)
+      L.push(ehV ? limitar($("o-visitas").value,1,6)+" visita"+(limitar($("o-visitas").value,1,6)>1?"s":"")+" por dia × "+dias()+" dia"+(dias()>1?"s":"")+" = "+viagens+" visita"+(viagens>1?"s":"")+" × "+brl(base)+" = "+brl(viagens*base)
                  : viagens+" passeio"+(viagens>1?"s":"")+" × "+brl(base)+" = "+brl(viagens*base));
       if(ehV) desc = viagens>=14?0.12:(viagens>=7?0.10:(viagens>=3?0.05:0));
       servico = viagens*base*(1-desc);
       if(desc>0) L.push("Desconto de "+Math.round(desc*100)+"% pelo número de visitas: − "+brl(viagens*base*desc));
     }
-    if(extraAn>0){ L.push("Animais a mais (R$ 6,00 por animal extra, por "+(oS.value==="passeio"?"passeio":"visita")+"): + "+brl(viagens*extraAn)); servico+=viagens*extraAn; }
+    var un=(oS.value==="passeio"?"passeio":"visita");
+    if(gExt>0){ L.push("Gatos a mais ("+gExt+" × R$ 2,00 por "+un+"): + "+brl(viagens*gExt*2)); servico+=viagens*gExt*2; }
+    if(oExt>0){ L.push("Animais a mais ("+oExt+" × R$ 6,00 por "+un+"): + "+brl(viagens*oExt*6)); servico+=viagens*oExt*6; }
     ult={viagens:viagens,semanas:semanas,desc:desc,n:n};
     detalhe(L);
     $("o-total").textContent=brl(servico);
@@ -403,7 +406,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
     return servico;
   }
   oS.addEventListener("change", function(){
-    var ex=oS.value==="exotico"; oEW.hidden=!ex; $("o-fim-wrap").hidden=(oS.value!=="visita"&&!ex); if($("o-fim-wrap").hidden) $("o-fim").value=""; $("o-pac-wrap").hidden=oS.value!=="passeio"; if(oS.value!=="passeio") $("o-pacote").value="1";
+    var ex=oS.value==="exotico"; oEW.hidden=!ex; $("o-fim-wrap").hidden=(oS.value!=="visita"&&!ex); $("o-gatos-wrap").hidden=(oS.value!=="visita"); if($("o-gatos-wrap").hidden) $("o-gatos").value="0"; if($("o-fim-wrap").hidden) $("o-fim").value=""; $("o-pac-wrap").hidden=oS.value!=="passeio"; if(oS.value!=="passeio") $("o-pacote").value="1";
     if(ex && oE.options.length<2){ Object.keys(SERV.exotico.esp).forEach(function(k){ var o=document.createElement("option"); o.value=k; o.textContent=k; oE.appendChild(o); }); }
     oE.value=""; preencherDuracao(); calcular();
   });
@@ -420,7 +423,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
     var linhas=["Olá! Quero pedir um orçamento da Amor com Patas.","",
       "Nome: "+nome,"Serviço: "+s.nome];
     if(oS.value==="exotico") linhas.push("Espécie: "+oE.value);
-    linhas.push("Duração: "+dur,"Animais: "+qtd,(pacoteN()>1 ? "Pacote: "+pacoteN()+"x por semana, durante "+ult.semanas+" semana"+(ult.semanas>1?"s":"")+" ("+ult.viagens+" passeios)" : (oS.value==="passeio" ? "Quantidade: "+vis+" "+s.un+(vis>1?"s":"") : "Visitas: "+limitar($("o-visitas").value,1,6)+" por dia, "+dias()+" dia"+(dias()>1?"s":"")+" ("+vis+" no total)")),"Início: "+data,
+    linhas.push("Duração: "+dur,"Animais: "+qtd+(oS.value==="visita"&&limitar($("o-gatos").value,0,10)>0?" ("+Math.min(limitar($("o-gatos").value,0,10),qtd)+" gatos)":""),(pacoteN()>1 ? "Pacote: "+pacoteN()+"x por semana, durante "+ult.semanas+" semana"+(ult.semanas>1?"s":"")+" ("+ult.viagens+" passeios)" : (oS.value==="passeio" ? "Quantidade: "+vis+" "+s.un+(vis>1?"s":"") : "Visitas: "+limitar($("o-visitas").value,1,6)+" por dia, "+dias()+" dia"+(dias()>1?"s":"")+" ("+vis+" no total)")),"Início: "+data,
       "Bairro: "+($("o-bairro").value.trim()||"não informado"));
     if(fim) linhas.splice(linhas.indexOf("Início: "+data)+1,0,"Término: "+fim);
     var obs=$("o-obs").value.trim(); if(obs) linhas.push("Observações: "+obs);
