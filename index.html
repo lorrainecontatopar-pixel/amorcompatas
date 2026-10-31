@@ -277,15 +277,14 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
         <label id="o-vis-wrap"><span id="o-vis-txt">Quantos passeios ao todo?</span><input type="number" id="o-visitas" min="1" max="60" value="1" inputmode="numeric"><small id="o-vis-info" style="font-weight:400;display:block;margin-top:.3rem"></small></label>
         <label>Data de início<input type="date" id="o-data"></label>
         <label id="o-fim-wrap" hidden>Data final<input type="date" id="o-fim"></label>
-        <label>CEP<input type="text" id="o-cep" inputmode="numeric" maxlength="9" placeholder="00000-000" autocomplete="postal-code"></label>
-        <label>Número<input type="text" id="o-num" inputmode="numeric" maxlength="8" placeholder="Número da casa ou prédio"></label>
-        <div class="full"><button type="button" class="btn ghost" id="o-dist-btn">Calcular deslocamento</button><p id="o-dist-msg" style="margin:.5rem 0 0;font-size:.9rem" aria-live="polite">Informe o CEP e o número para eu calcular o deslocamento.</p></div>
+        <label class="full">Bairro<input type="text" id="o-bairro" placeholder="Em que bairro de São José dos Campos?"></label>
         <label class="full">Quer me contar mais alguma coisa?<textarea id="o-obs" rows="3" placeholder="Nome do pet, idade, remédios, cuidados especiais..."></textarea></label>
       </form>
       <div class="estimativa" aria-live="polite">
-        <p>Valor estimado</p>
+        <ul id="o-detalhe" style="margin:.2rem 0 .6rem 1.1rem;padding:0;font-size:.95rem"></ul>
+        <p style="margin:0">Valor estimado do serviço</p>
         <strong id="o-total">Responda as perguntas acima</strong>
-        <p id="o-nota" style="margin-top:.4rem;font-size:.9rem">Já inclui o deslocamento, calculado pela distância, cobrado por visita. Domingos +15%, feriados +20% e Natal e Ano Novo +30%.</p>
+        <p id="o-nota" style="margin-top:.4rem;font-size:.9rem">Valor do serviço, sem o deslocamento. O deslocamento eu calculo pelo seu endereço e te passo no WhatsApp. Domingos +15%, feriados +20% e Natal e Ano Novo +30%.</p>
       </div>
       <p class="erro" id="o-erro" role="alert"></p>
       <button type="button" class="btn" id="o-enviar">Enviar para o WhatsApp</button>
@@ -332,9 +331,6 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
       esp:{"Aves":[50,75],"Coelhos e porquinhos-da-índia":[55,80],"Tartarugas e jabutis":[50,75],"Iguanas, lagartos e serpentes":[70,100],"Hamsters e outros roedores pequenos":[45,65],"Outro (valor a combinar)":[0,0]}}
   };
   var $ = function(id){ return document.getElementById(id); };
-  var KM_VALOR = 0.50, KM_MIN = 5; // R$ por km (ida e volta) e mínimo por viagem
-  var ORIGEM = "Interlagos, São José dos Campos, SP, Brasil";
-  var origemXY = null, distKm = null;
   var oS=$("o-servico"), oE=$("o-especie"), oD=$("o-duracao"), oEW=$("o-esp-wrap");
   function brl(v){ return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"}); }
   function pacoteN(){ return oS.value==="passeio" ? (Number($("o-pacote").value)||1) : 1; }
@@ -350,7 +346,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
     if(oS.value==="exotico"){ if(!oE.value) return null; if(oE.value.indexOf("Outro")===0) return -1; return s.esp[oE.value][i]; }
     return s.dur[i][1];
   }
-  var NOTA = "Já inclui o deslocamento, calculado pela distância, cobrado por visita. Domingos +15%, feriados +20% e Natal e Ano Novo +30%.";
+  var NOTA = "Valor do serviço, sem o deslocamento. O deslocamento eu calculo pelo seu endereço e te passo no WhatsApp. Domingos +15%, feriados +20% e Natal e Ano Novo +30%.";
   var ult = null;
   function limitar(v,a,b){ v=Number(v)||a; return Math.min(b,Math.max(a,v)); }
   function dias(){
@@ -369,32 +365,42 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
     var p=limitar($("o-visitas").value,1,6), d=dias();
     info.textContent = d>1 ? d+" dias × "+p+" visita"+(p>1?"s":"")+" por dia = "+(p*d)+" visitas no total" : "Informe a data final para eu somar todos os dias.";
   }
+  function detalhe(linhas){
+    var ul=$("o-detalhe"); ul.innerHTML="";
+    linhas.forEach(function(l){ var li=document.createElement("li"); li.textContent=l; ul.appendChild(li); });
+  }
   function calcular(){
     textoVisitas(); $("o-vis-wrap").hidden = pacoteN()>1; $("o-sem-wrap").hidden = !(pacoteN()>1);
-    ult=null;
+    ult=null; detalhe([]);
     var base=precoBase(), qtd=limitar($("o-qtd").value,1,10);
     if(base===null){ $("o-total").textContent="Responda as perguntas acima"; $("o-nota").textContent=NOTA; return null; }
     if(base===-1){ $("o-total").textContent="Valor a combinar"; $("o-nota").textContent=NOTA; return -1; }
-    if(distKm===null){ $("o-total").textContent="Informe o CEP e o número e clique em Calcular deslocamento"; $("o-nota").textContent=NOTA; return null; }
-    var tx=Math.max(KM_MIN, Math.round(distKm*KM_VALOR*100)/100);
-    var n=pacoteN(), extraAn=(qtd>2?(qtd-2)*6:0), viagens, servico, desc=0, semanas=1;
+    var n=pacoteN(), extraAn=(qtd>2?(qtd-2)*6:0), viagens, servico, desc=0, semanas=1, L=[];
+    var s0=SERV[oS.value], durTxt=s0.dur[Number(oD.value)][0];
+    L.push("Serviço: "+s0.nome+(oS.value==="exotico"?" ("+oE.value+")":"")+", "+durTxt);
+    L.push("Animais: "+qtd);
     if(n>1){
       semanas=limitar($("o-semanas").value,1,12); viagens=n*semanas;
-      servico=SERV.passeio.pac[n][Number(oD.value)]*semanas + viagens*extraAn;
+      var pk=SERV.passeio.pac[n][Number(oD.value)];
+      L.push("Pacote "+n+"x por semana, "+semanas+" semana"+(semanas>1?"s":"")+" ("+viagens+" passeios): "+brl(pk)+" × "+semanas+" = "+brl(pk*semanas));
+      servico=pk*semanas;
     } else {
       viagens=totalVisitas();
-      if(oS.value!=="passeio") desc = viagens>=14?0.12:(viagens>=7?0.10:(viagens>=3?0.05:0));
-      servico = viagens*base*(1-desc) + viagens*extraAn;
+      var ehV=oS.value!=="passeio";
+      L.push(ehV ? limitar($("o-visitas").value,1,6)+" visita"+(limitar($("o-visitas").value,1,6)>1?"s":"")+" por dia × "+dias()+" dia"+(dias()>1?"s":"")+" = "+viagens+" visitas × "+brl(base)+" = "+brl(viagens*base)
+                 : viagens+" passeio"+(viagens>1?"s":"")+" × "+brl(base)+" = "+brl(viagens*base));
+      if(ehV) desc = viagens>=14?0.12:(viagens>=7?0.10:(viagens>=3?0.05:0));
+      servico = viagens*base*(1-desc);
+      if(desc>0) L.push("Desconto de "+Math.round(desc*100)+"% pelo número de visitas: − "+brl(viagens*base*desc));
     }
-    var desloc = Math.round((tx + (viagens-1)*tx*0.5)*100)/100, total = servico + desloc;
-    ult={viagens:viagens,semanas:semanas,desc:desc,desloc:desloc,n:n};
-    $("o-total").textContent=brl(total);
-    var t="Inclui "+brl(desloc)+" de deslocamento"+(viagens>1?" ("+distKm.toFixed(1).replace(".",",")+" km de ida e volta por viagem; taxa cheia na 1ª viagem e 50% nas demais)":" ("+distKm.toFixed(1).replace(".",",")+" km, ida e volta)")+".";
-    if(desc>0) t+=" Desconto de "+Math.round(desc*100)+"% nas visitas.";
+    if(extraAn>0){ L.push("Animais a mais (R$ 6,00 por animal extra, por "+(oS.value==="passeio"?"passeio":"visita")+"): + "+brl(viagens*extraAn)); servico+=viagens*extraAn; }
+    ult={viagens:viagens,semanas:semanas,desc:desc,n:n};
+    detalhe(L);
+    $("o-total").textContent=brl(servico);
+    var t=NOTA;
     if(viagens>=3) t+=" Em contratos de vários dias, 50% é pago adiantado e o restante no último dia.";
-    t+=" Domingos +15%, feriados +20% e Natal e Ano Novo +30%.";
     $("o-nota").textContent=t;
-    return total;
+    return servico;
   }
   oS.addEventListener("change", function(){
     var ex=oS.value==="exotico"; oEW.hidden=!ex; $("o-fim-wrap").hidden=(oS.value!=="visita"&&!ex); if($("o-fim-wrap").hidden) $("o-fim").value=""; $("o-pac-wrap").hidden=oS.value!=="passeio"; if(oS.value!=="passeio") $("o-pacote").value="1";
@@ -402,43 +408,6 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
     oE.value=""; preencherDuracao(); calcular();
   });
   ["change","input"].forEach(function(ev){ $("form-orc").addEventListener(ev, calcular); });
-  function geocodificar(q){
-    return fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=br&q="+encodeURIComponent(q))
-      .then(function(r){ return r.json(); })
-      .then(function(j){ if(!j||!j.length) return null; return [parseFloat(j[0].lon), parseFloat(j[0].lat)]; });
-  }
-  var bairroSel = "";
-  function buscarDistancia(){
-    var cep=$("o-cep").value.replace(/\D/g,""), num=$("o-num").value.trim(), msg=$("o-dist-msg");
-    if(cep.length!==8){ msg.textContent="Digite o CEP com 8 números."; return; }
-    msg.textContent="Calculando o deslocamento..."; distKm=null; bairroSel=""; calcular();
-    var pOrig = origemXY ? Promise.resolve(origemXY) : geocodificar(ORIGEM).then(function(x){ origemXY=x; return x; });
-    fetch("https://viacep.com.br/ws/"+cep+"/json/").then(function(r){ return r.json(); }).then(function(c){
-      if(!c||c.erro){ msg.textContent="Não encontrei esse CEP. Confira os números ou me chame no WhatsApp."; return null; }
-      if(c.uf!=="SP" || (c.localidade||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase()!=="sao jose dos campos"){ msg.textContent="Por enquanto atendo apenas em São José dos Campos."; return null; }
-      bairroSel=c.bairro||"";
-      var rua=(c.logradouro||"")+", "+(c.bairro||"")+", São José dos Campos, SP, Brasil";
-      var comNum=(num?num+" ":"")+rua;
-      return pOrig.then(function(o){
-        return geocodificar(comNum).then(function(d){ return d||geocodificar(rua); }).then(function(d){ return [o,d]; });
-      }).then(function(par){
-        var o=par[0], d=par[1];
-        if(!o||!d){ msg.textContent="Não consegui localizar esse endereço no mapa. Me chame no WhatsApp que eu confirmo o valor."; return null; }
-        return fetch("https://router.project-osrm.org/route/v1/driving/"+o[0]+","+o[1]+";"+d[0]+","+d[1]+"?overview=false")
-          .then(function(r){ return r.json(); })
-          .then(function(j){
-            if(!j.routes||!j.routes.length){ msg.textContent="Não consegui calcular a rota. Me chame no WhatsApp que eu confirmo o valor."; return; }
-            distKm=Math.round(j.routes[0].distance*2/100)/10;
-            msg.textContent="Distância de ida e volta: "+distKm.toFixed(1).replace(".",",")+" km.";
-            calcular();
-          });
-      });
-    }).catch(function(){ msg.textContent="Não consegui calcular agora. Tente de novo ou me chame no WhatsApp."; });
-  }
-  $("o-dist-btn").addEventListener("click", buscarDistancia);
-  function resetDist(){ distKm=null; bairroSel=""; $("o-dist-msg").textContent="Clique em Calcular deslocamento."; calcular(); }
-  $("o-cep").addEventListener("input", function(){ var v=this.value.replace(/\D/g,"").slice(0,8); this.value=v.length>5?v.slice(0,5)+"-"+v.slice(5):v; resetDist(); });
-  $("o-num").addEventListener("input", resetDist);
   $("o-enviar").addEventListener("click", function(){
     var nome=$("o-nome").value.trim(), erro=$("o-erro"), total=calcular();
     if(!nome || total===null){ erro.textContent="Preencha seu nome, o serviço, a espécie (se for animal exótico) e a duração para enviar."; return; }
@@ -452,10 +421,10 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
       "Nome: "+nome,"Serviço: "+s.nome];
     if(oS.value==="exotico") linhas.push("Espécie: "+oE.value);
     linhas.push("Duração: "+dur,"Animais: "+qtd,(pacoteN()>1 ? "Pacote: "+pacoteN()+"x por semana, durante "+ult.semanas+" semana"+(ult.semanas>1?"s":"")+" ("+ult.viagens+" passeios)" : (oS.value==="passeio" ? "Quantidade: "+vis+" "+s.un+(vis>1?"s":"") : "Visitas: "+limitar($("o-visitas").value,1,6)+" por dia, "+dias()+" dia"+(dias()>1?"s":"")+" ("+vis+" no total)")),"Início: "+data,
-      (bairroSel?"Bairro: "+bairroSel:"Bairro: não informado"),"Distância (ida e volta): "+(distKm===null?"não calculada":distKm.toFixed(1).replace(".",",")+" km"));
+      "Bairro: "+($("o-bairro").value.trim()||"não informado"));
     if(fim) linhas.splice(linhas.indexOf("Início: "+data)+1,0,"Término: "+fim);
     var obs=$("o-obs").value.trim(); if(obs) linhas.push("Observações: "+obs);
-    linhas.push("", total===-1 ? "Valor: a combinar (espécie fora da lista)" : "Valor estimado: "+brl(total)+" (com deslocamento)");
+    linhas.push("", total===-1 ? "Valor: a combinar (espécie fora da lista)" : "Valor estimado do serviço: "+brl(total)+" (sem o deslocamento, que você me passa pelo WhatsApp)");
     if(total!==-1&&ult&&ult.desc>0) linhas.push("Desconto nas visitas: "+Math.round(ult.desc*100)+"%");
     if(total!==-1&&ult&&ult.viagens>=3) linhas.push("Pagamento: 50% adiantado e o restante no último dia.");
     window.open("https://wa.me/"+WHATSAPP+"?text="+encodeURIComponent(linhas.join("\n")),"_blank","noopener");
