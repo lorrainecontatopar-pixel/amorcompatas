@@ -276,6 +276,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
         <label id="o-sem-wrap" hidden>Quantas semanas?<input type="number" id="o-semanas" min="1" max="12" value="4" inputmode="numeric"></label>
         <label id="o-vis-wrap">Quantas visitas ou passeios ao todo?<input type="number" id="o-visitas" min="1" max="60" value="1" inputmode="numeric"></label>
         <label>Data de início<input type="date" id="o-data"></label>
+        <label id="o-fim-wrap" hidden>Data final<input type="date" id="o-fim"></label>
         <label class="full">Região de São José dos Campos<select id="o-regiao"><option value="">Escolha...</option><option value="Zona Sul">Zona Sul</option><option value="Centro">Centro</option><option value="Zona Sudeste">Zona Sudeste</option><option value="Zona Oeste">Zona Oeste</option><option value="Zona Norte">Zona Norte (somente pacotes)</option><option value="Zona Leste">Zona Leste (somente pacotes)</option></select></label>
         <label class="full">Bairro<input type="text" id="o-bairro" placeholder="Em que bairro de São José dos Campos?"></label>
         <label class="full">Quer me contar mais alguma coisa?<textarea id="o-obs" rows="3" placeholder="Nome do pet, idade, remédios, cuidados especiais..."></textarea></label>
@@ -382,7 +383,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
     return total;
   }
   oS.addEventListener("change", function(){
-    var ex=oS.value==="exotico"; oEW.hidden=!ex; $("o-pac-wrap").hidden=oS.value!=="passeio"; if(oS.value!=="passeio") $("o-pacote").value="1";
+    var ex=oS.value==="exotico"; oEW.hidden=!ex; $("o-fim-wrap").hidden=(oS.value!=="visita"&&!ex); if($("o-fim-wrap").hidden) $("o-fim").value=""; $("o-pac-wrap").hidden=oS.value!=="passeio"; if(oS.value!=="passeio") $("o-pacote").value="1";
     if(ex && oE.options.length<2){ Object.keys(SERV.exotico.esp).forEach(function(k){ var o=document.createElement("option"); o.value=k; o.textContent=k; oE.appendChild(o); }); }
     oE.value=""; preencherDuracao(); calcular();
   });
@@ -393,11 +394,15 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
     erro.textContent="";
     var s=SERV[oS.value], dur=s.dur[Number(oD.value)][0], vis=limitar($("o-visitas").value,1,60), qtd=limitar($("o-qtd").value,1,10);
     var d=$("o-data").value, data=d?d.split("-").reverse().join("/"):"a combinar";
+    var fimV=$("o-fim").value;
+    if(fimV && d && fimV<d){ erro.textContent="A data final não pode ser antes da data de início."; return; }
+    var fim=fimV?fimV.split("-").reverse().join("/"):"";
     var linhas=["Olá! Quero pedir um orçamento da Amor com Patas.","",
       "Nome: "+nome,"Serviço: "+s.nome];
     if(oS.value==="exotico") linhas.push("Espécie: "+oE.value);
     linhas.push("Duração: "+dur,"Animais: "+qtd,(pacoteN()>1 ? "Pacote: "+pacoteN()+"x por semana, durante "+ult.semanas+" semana"+(ult.semanas>1?"s":"")+" ("+ult.viagens+" passeios)" : "Quantidade: "+vis+" "+s.un+(vis>1?"s":"")),"Início: "+data,
       "Região: "+($("o-regiao").value||"não informada"),"Bairro: "+($("o-bairro").value.trim()||"não informado"));
+    if(fim) linhas.splice(linhas.indexOf("Início: "+data)+1,0,"Término: "+fim);
     var obs=$("o-obs").value.trim(); if(obs) linhas.push("Observações: "+obs);
     linhas.push("", total===-1 ? "Valor: a combinar (espécie fora da lista)" : "Valor estimado: "+brl(total)+" (com deslocamento)");
     if(total!==-1&&ult&&ult.desc>0) linhas.push("Desconto nas visitas: "+Math.round(ult.desc*100)+"%");
