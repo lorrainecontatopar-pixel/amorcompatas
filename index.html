@@ -193,10 +193,10 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
         <button class="fechar" id="fechar-servicos" type="button" aria-label="Fechar serviços">×</button>
       </div>
       <div class="painel-grid">
-        <article><h3>Passeio com cães</h3><p>Caminhadas e corridas no ritmo do seu cão.</p><p class="preco">30 min: R$ 50</p><p class="preco">60 min: R$ 60</p><p style="margin-top:.8rem">Pacotes semanais, com desconto:</p><div class="especies">
-          <details class="especie"><summary>Pacote 2x por semana</summary><div class="corpo"><p class="preco">30 min: R$ 90 por semana (R$ 45 cada)</p><p class="preco">60 min: R$ 110 por semana (R$ 55 cada)</p></div></details>
-          <details class="especie"><summary>Pacote 3x por semana</summary><div class="corpo"><p class="preco">30 min: R$ 132 por semana (R$ 44 cada)</p><p class="preco">60 min: R$ 159 por semana (R$ 53 cada)</p></div></details>
-          <details class="especie"><summary>Pacote 5x por semana</summary><div class="corpo"><p class="preco">30 min: R$ 205 por semana (R$ 41 cada)</p><p class="preco">60 min: R$ 250 por semana (R$ 50 cada)</p></div></details>
+        <article><h3>Passeio com cães</h3><p>Caminhadas e corridas no ritmo do seu cão.</p><p class="preco">30 min: R$ 40</p><p class="preco">60 min: R$ 55</p><p style="margin-top:.8rem">Pacotes semanais, com desconto:</p><div class="especies">
+          <details class="especie"><summary>Pacote 2x por semana</summary><div class="corpo"><p class="preco">30 min: R$ 72 por semana (R$ 36 cada)</p><p class="preco">60 min: R$ 100 por semana (R$ 50 cada)</p></div></details>
+          <details class="especie"><summary>Pacote 3x por semana</summary><div class="corpo"><p class="preco">30 min: R$ 102 por semana (R$ 34 cada)</p><p class="preco">60 min: R$ 141 por semana (R$ 47 cada)</p></div></details>
+          <details class="especie"><summary>Pacote 5x por semana</summary><div class="corpo"><p class="preco">30 min: R$ 155 por semana (R$ 31 cada)</p><p class="preco">60 min: R$ 215 por semana (R$ 43 cada)</p></div></details>
         </div></article>
         <article><h3>Pet sitter para gatos</h3><p>Comida, brincadeira, limpeza da caixinha e remédios, na sua casa.</p><p class="preco">45 min: R$ 45</p><p class="preco">1 hora: R$ 55</p><p>Gato extra, a partir do 3º: + R$ 2 por visita.</p></article>
         <article><h3>Pet sitter para cães</h3><p>Comida, brincadeira, limpeza e remédios, na sua casa.</p><p class="preco">45 min: R$ 45</p><p class="preco">1 hora: R$ 65</p><p>Cão extra, a partir do 3º: + R$ 6 por visita.</p></article>
@@ -329,7 +329,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
     x.addEventListener("click", function(){ fecharTodos(); });
   });
   var SERV = {
-    passeio:{nome:"Passeio com cães", un:"passeio", dur:[["30 min",50],["60 min",60]], pac:{"2":[90,110],"3":[132,159],"5":[205,250]}},
+    passeio:{nome:"Passeio com cães", un:"passeio", dur:[["30 min",40],["60 min",55]], pac:{"2":[72,100],"3":[102,141],"5":[155,215]}},
     gato:{nome:"Pet sitter para gatos", un:"visita", dur:[["45 min",45],["1 hora",55]]},
     cao:{nome:"Pet sitter para cães", un:"visita", dur:[["45 min",45],["1 hora",65]]},
     exotico:{nome:"Pet sitter para animais exóticos", un:"visita", dur:[["30 a 45 min",0],["1 hora",1]],
