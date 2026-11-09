@@ -166,7 +166,8 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
         <p>Seu pet merece o melhor cuidado nos dias em que você não estiver. Eu mantenho a rotina dele, no conforto da sua casa. Cães, gatos ou animais silvestres: todos recebem atenção e carinho de verdade.</p>
         <div class="sobre">
           <h2>Sobre mim</h2>
-          <p>Oi, tudo bem? Eu sou a Lorraine, estudante de Medicina Veterinária e apaixonada por animais de todos os tipos.</p>
+          <p>Oi, tudo bem? Eu sou a Lorraine, apaixonada por animais de todos os tipos e o coração da Amor com Patas.</p>
+          <p>Estou me formando em Medicina Veterinária e fiz curso de adestramento canino. É esse conhecimento que levo para cada atendimento: ele me ajuda a entender o comportamento do seu pet, a perceber quando algo não vai bem e a cuidar de cada espécie com segurança.</p>
           <p>Pode ficar tranquilo: sou responsável e dedicada, e vou cuidar do seu pet com todo o carinho e a atenção que ele merece, para que ele não se sinta sozinho nos momentos em que você não puder estar.</p>
         </div>
       </div>
@@ -471,7 +472,6 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-size:.95rem}
     linhas.push("", total===-1 ? "Valor: a combinar (espécie fora da lista)" : "Valor estimado do serviço: "+brl(total)+" (sem o deslocamento, que você me passa pelo WhatsApp)");
     if(total!==-1&&ult&&ult.det&&ult.det.length){ linhas.push("","Detalhamento do valor:"); ult.det.forEach(function(d){ linhas.push("- "+d); }); }
     if(total!==-1&&ult&&ult.desc>0) linhas.push("Desconto nas visitas: "+Math.round(ult.desc*100)+"%");
-    if(total!==-1&&ult&&ult.viagens>=3) linhas.push("Pagamento: 50% adiantado e o restante no último dia.");
     window.open("https://wa.me/"+WHATSAPP+"?text="+encodeURIComponent(linhas.join("\n")),"_blank","noopener");
   });
   $("o-cep").addEventListener("input", function(){ var v=this.value.replace(/\D/g,"").slice(0,8); this.value=v.length>5?v.slice(0,5)+"-"+v.slice(5):v; });
